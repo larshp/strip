@@ -24,23 +24,26 @@ function stripCLAS(lines) {
   let section = undefined;
   let result = [];
 
-  for (const line of lines) {
+  for (let line of lines) {
     if (line.match(/\sFINAL\s/i) || line.match(/\sFINAL$/i)) {
       isFinal = true;
     } else if (line.match(/\./) && isFinal == undefined) {
       isFinal = false;
     }
 
-    if (line.match(/\s*PROTECTED\s+SECTION/i)) {
+    if (line.match(/^\s*PROTECTED\s+SECTION/i)) {
       section = "protected";
       result.push(line);
       continue;
-    } else if (line.match(/\s*PRIVATE\s+SECTION/i)) {
+    } else if (line.match(/^\s*PRIVATE\s+SECTION/i)) {
       section = "private";
       result.push(line);
       continue;
-    } else if (line.match(/^\s*METHOD\s+/i) && section === undefined) {
+    } else if (line.match(/^\s*METHOD\s+[\w~]+/i) && section === undefined) {
       section = "method";
+      if (line.includes(".") === false) {
+        line = line + ".";
+      }
       result.push(line);
       continue;
     } else if (line.match(/^\s*ENDCLASS/i)) {
