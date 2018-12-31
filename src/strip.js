@@ -39,6 +39,10 @@ function stripCLAS(lines) {
       section = "private";
       result.push(line);
       continue;
+// DEFINE statement outside of METHOD
+    } else if (line.match(/^\s*DEFINE\s+[\w~]+/i) && section === undefined) {
+      section = "define";
+      continue;
     } else if (line.match(/^\s*METHOD\s+[\w~]+/i) && section === undefined) {
       section = "method";
       if (line.includes(".") === false) {
@@ -50,13 +54,14 @@ function stripCLAS(lines) {
       section = undefined;
     } else if (line.match(/^\s*ENDMETHOD/i)) {
       section = undefined;
+    } else if (line.match(/^\s*END-OF-DEFINITION/i) && section === "define") {
+      section = undefined;
+      continue;
     }
 
     if (isFinal === true && section === "protected") {
       continue;
-    } else if (section === "private") {
-      continue;
-    } else if (section === "method") {
+    } else if (section === "private" || section === "method" || section === "define") {
       continue;
     }
 
